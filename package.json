@@ -1,0 +1,18 @@
+{
+  "name": "tp_objetos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "cuenta":"tsc cuenta.ts & node cuenta.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.0.26",
+    "bcryptjs": "^2.4.3",
+    "readline-sync": "^1.4.10"
+  }
+}
