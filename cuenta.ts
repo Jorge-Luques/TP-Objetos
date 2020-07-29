@@ -1,6 +1,6 @@
 import * as rs from 'readline-sync';
 import * as fs from 'fs';
-const bcrypt = require('bcryptjs');
+import * as bcr from 'bcryptjs';
 
 class Admin{
     private usuarios: string[];
@@ -16,19 +16,19 @@ class Admin{
         this.usuarios.push(user);
     }
 
-    // public quitarUsuario(user: Usuario): void{
-    //     let userAux: Usuario;
-    //     let indexAux: number;
-    //     for (let i=0; i < this.usuarios.length; i++){
-    //         userAux = this.usuarios[i];
-    //         if(userAux.get_nickName === user.get_nickName){
-    //             for(indexAux = i; indexAux < this.usuarios.length-1;indexAux++){
-    //                 this.usuarios[indexAux] = this.usuarios[indexAux+1];
-    //             }
-    //             this.usuarios.pop();
-    //         }
-    //     }
-    // }
+    public quitarUsuario(user: Usuario): void{
+        let userAux: string;
+        let indexAux: number;
+        for (let i=0; i < this.usuarios.length; i++){
+            userAux = this.usuarios[i];
+            if(userAux === user.get_nickName()){
+                for(indexAux = i; indexAux < this.usuarios.length-1;indexAux++){
+                    this.usuarios[indexAux] = this.usuarios[indexAux+1];
+                }
+                this.usuarios.pop();
+            }
+        }
+    }
 
     public addcuenta(newCuenta: Cuenta):void{
         this.cuentas.push(newCuenta);
@@ -63,25 +63,30 @@ class Usuario{
         this.contrasena = password;
     }
 
-    // public login(cuenta: Cuenta){
+    public login(cuenta: Cuenta){
+        let user: string;
+        let pass: string;
+        user = rs.question("ingresar usuario: ");
+        pass = rs.question("ingresar la contrasena: ");
+        if (user == cuenta.getUsuario() && bcr.compare(pass,bcr.hashSync(cuenta.getPassword()))){
+            console.log('ingreso a la cuenta...');
+        }
+        else{
+            console.log('nombre de usuario y/o contraseña incorrectos');
+        }
 
-    // }
-
+    }
 
 }
 
 class Cuenta{
     private user: Usuario;
     private password: string;
-    // private salt= 10;
 
-    
-    
 
     constructor (nick:string, password: string){
-        this.user = new Usuario(nick, password);
-
-        this.password="******";
+        this.user = new Usuario(nick, bcr.hashSync(password));
+        this.password = bcr.hashSync(password);
        
     }
 
@@ -89,12 +94,18 @@ class Cuenta{
         return this.user.get_nickName();
     }
 
-    public setPassword(pass2: string):void{
-        this.password = pass2;
+    public setPassword():void{
+        let passAux:string, pass2:string;
+        passAux = rs.question("ingresar la actual contrasenia: ");
+        pass2 = rs.question("ingresar la nueva contrasenia: ")
+        if (passAux == this.password){
+            this.password = pass2;
+            bcr.hashSync(pass2);
+        } 
     }
 
     public getPassword():string{
-        return this.password;
+            return this.password;
     }
 }
 
@@ -107,30 +118,10 @@ admin.addcuenta(miCta);
 console.log(admin);
 console.log(miUser);
 console.log(miCta);
-///probando bcrypt
-let myvalue = "JFDSNJDSNFJSDNFSJASASNDCAUDHANDKLAMDXIALWDMQAW";
+miCta.setPassword();
+console.log(miCta);
+miUser.login(miCta);
 
-bcrypt.hash(myvalue, 10, (err, hash) => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    console.log(hash)
-    
-    bcrypt.compare(myvalue, hash, (err, res) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      console.log(res)
-    })
-  
-  })
-  
-  const hashPassword = async () => {
-    const hash = await bcrypt.hash(myvalue, 10)
-    console.log(hash)
-    console.log(await bcrypt.compare(myvalue, hash))
-  }
-  
-  hashPassword();
+// admin.quitarUsuario(miUser);
+// console.log(admin);
+
